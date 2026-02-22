@@ -14,3 +14,7 @@ DATA_DIR = ROOT / "data"
 LANGSMITH_API_KEY = os.getenv("LANGSMITH_API_KEY")
 if not LANGSMITH_API_KEY:
     raise ValueError("LANGSMITH_API_KEY is not set in the .env file")
+
+# Splitter Config
+CHUNK_SIZE = 1000
+CHUNK_OVERLAP = 200
