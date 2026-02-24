@@ -26,11 +26,12 @@ def get_vector_store(collection_name="my_documents", documents=None):
     if not client.collection_exists(collection_name):
         # It's better to know your vector size than to make an API call to find out
         # But if you must use the hack, do it here so it only runs ONCE when creating the collection
-        vector_size = len(embeddings.embed_query("sample text")) 
+        # vector_size = len(embeddings.embed_query("sample text")) 
+        
         
         client.create_collection(
             collection_name=collection_name,
-            vectors_config=VectorParams(size=vector_size, distance=Distance.COSINE)
+            vectors_config=VectorParams(size=VECTOR_SIZE, distance=Distance.COSINE)
         )
 
     # 3. Create the LangChain VectorStore wrapper
@@ -47,6 +48,7 @@ def get_vector_store(collection_name="my_documents", documents=None):
         
     return vector_store
 
+
 if __name__ == "__main__":
     # Now you control exactly when the loading and splitting happens!
     from document_loader import load_documents
@@ -61,7 +63,27 @@ if __name__ == "__main__":
 
     
     print("Initializing vector store and adding documents...")
+
     # We pass the splits directly into the function
-    vector_store = get_vector_store(collection_name="test", documents=all_splits)
+    vector_store = get_vector_store(collection_name="my_documents", documents=all_splits)
     
     print("Done! Vector store is ready.")
+
+    # results = vector_store.similarity_search(
+    # "How many distribution centers does Nike have in the US?")
+
+    # print(results[0])
+
+    retriever = vector_store.as_retriever(
+        search_type="similarity",
+        search_kwargs={"k": 1},
+        )
+    
+    results = retriever.batch(
+    [
+        "How many distribution centers does Nike have in the US?",
+        "When was Nike incorporated?",
+    ],
+    )
+
+    print(results)
